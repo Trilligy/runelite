@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, SomeoneWithAnInternetConnection
+ * Copyright (c) 2019 ThatGamerBlue
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,32 +23,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.runelite.client.plugins.grandexchange;
-
-import net.runelite.api.GrandExchangeOffer;
-import net.runelite.api.GrandExchangeOfferState;
-import net.runelite.api.ItemDefinition;
-import net.runelite.client.game.AsyncBufferedImage;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.mockito.junit.MockitoJUnitRunner;
-
-@RunWith(MockitoJUnitRunner.class)
-public class GrandExchangeOfferSlotTest
+/**
+ * @author ThatGamerBlue
+ *
+ * This file exists to force gradle to execute the compileJava task
+ * so we can hijack it and run the injector-plugin
+ */
+public class Placeholder
 {
-	@Mock
-	private GrandExchangeOffer offer;
-
-	@Test
-	public void testUpdateOffer()
-	{
-		when(offer.getState()).thenReturn(GrandExchangeOfferState.CANCELLED_BUY);
-
-		GrandExchangeOfferSlot offerSlot = new GrandExchangeOfferSlot();
-		offerSlot.updateOffer(mock(ItemDefinition.class), mock(AsyncBufferedImage.class), offer);
-	}
-
 }
