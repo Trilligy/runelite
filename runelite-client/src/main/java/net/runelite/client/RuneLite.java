@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class RuneLite
 {
-	public static final String PLUS_VERSION = "2.1.0.0";
+	public static final String PLUS_VERSION = "2.1.1.0";
 	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), ".runelite");
 	public static final File PROFILES_DIR = new File(RUNELITE_DIR, "profiles");
 	public static final File PLUGIN_DIR = new File(RUNELITE_DIR, "plugins");
@@ -178,8 +178,6 @@ public class RuneLite
 		parser.accepts("developer-mode", "Enable developer tools");
 		parser.accepts("debug", "Show extra debugging output");
 		parser.accepts("no-splash", "Do not show the splash screen");
-		parser.accepts("local-injected", "Use local injected-client - DEPRECATED");
-		parser.accepts("private-server", "Use a custom codebase - DEPRECATED: Use --rs=RSPS");
 
 		final ArgumentAcceptingOptionSpec<String> proxyInfo = parser
 			.accepts("proxy")
@@ -256,16 +254,6 @@ public class RuneLite
 		{
 			final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 			logger.setLevel(Level.DEBUG);
-		}
-
-		if (options.has("local-injected"))
-		{
-			log.warn("--local-injected has been deprecated and may get removed soon");
-		}
-
-		if (options.has("private-server"))
-		{
-			allowPrivateServer = true;
 		}
 
 		Thread.setDefaultUncaughtExceptionHandler((thread, throwable) ->
