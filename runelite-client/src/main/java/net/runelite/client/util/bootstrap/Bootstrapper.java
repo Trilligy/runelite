@@ -11,10 +11,10 @@ public class Bootstrapper
 	public static String remoteLocation;
 	public static String localLocation;
 
-	public static void main(String[] args)
+	public static void main(boolean staging)
 	{
 
-		if (args.length > 0)
+		if (staging)
 		{
 			remoteLocation = "staging/";
 			localLocation = "./staging/";
@@ -32,7 +32,7 @@ public class Bootstrapper
 		}
 		else
 		{
-			remoteLocation = "/live/";
+			remoteLocation = "live/";
 			localLocation = "./live/";
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 			File dir = new File("./live/");
