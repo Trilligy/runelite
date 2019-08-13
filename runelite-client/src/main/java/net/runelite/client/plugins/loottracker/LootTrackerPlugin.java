@@ -44,6 +44,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,7 +129,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class LootTrackerPlugin extends Plugin
 {
 	// Activity/Event loot handling
-	private static final Pattern CLUE_SCROLL_PATTERN = Pattern.compile("You have completed [0-9]+ ([a-z]+) Treasure Trails.");
+	private static final Pattern CLUE_SCROLL_PATTERN = Pattern.compile("You have completed ([0-9]+) ([a-z]+) Treasure Trails.");
 	private static final int THEATRE_OF_BLOOD_REGION = 12867;
 
 	private static final Pattern BOSS_NAME_NUMBER_PATTERN = Pattern.compile("Your (.*) kill count is: ([0-9]*).");
@@ -629,6 +630,10 @@ public class LootTrackerPlugin extends Plugin
 				// Clue Scrolls use same InventoryID as Barrows
 				container = client.getItemContainer(InventoryID.BARROWS_REWARD);
 				break;
+			case (WidgetID.KINGDOM_GROUP_ID):
+				eventType = "Kingdom of Miscellania";
+				container = client.getItemContainer(InventoryID.KINGDOM_OF_MISCELLANIA);
+				break;
 			default:
 				return;
 		}
@@ -757,7 +762,7 @@ public class LootTrackerPlugin extends Plugin
 		final Matcher m = CLUE_SCROLL_PATTERN.matcher(chatMessage);
 		if (m.find())
 		{
-			final String type = m.group(1).toLowerCase();
+			final String type = m.group(2).toLowerCase();
 			switch (type)
 			{
 				case "beginner":
@@ -1147,18 +1152,17 @@ public class LootTrackerPlugin extends Plugin
 
 	private Collection<LootTrackerRecord> convertToLootTrackerRecord(final Collection<LootRecord> records)
 	{
-		Collection<LootTrackerRecord> trackerRecords = new ArrayList<>();
-		for (LootRecord record : records)
-		{
-			LootTrackerItem[] drops = record.getDrops().stream().map(itemStack ->
-				buildLootTrackerItem(itemStack.getId(), itemStack.getQty())
-			).toArray(LootTrackerItem[]::new);
-
-			trackerRecords.add(new LootTrackerRecord(record.getEventId(), record.getUsername(),
-				"", drops, record.getTime()));
-		}
-
-		return trackerRecords;
+		return records.stream()
+			.sorted(Comparator.comparing(LootRecord::getTime))
+			.map(record ->
+			{
+				LootTrackerItem[] drops = record.getDrops().stream().map(itemStack ->
+					buildLootTrackerItem(itemStack.getId(), itemStack.getQty())
+				).toArray(LootTrackerItem[]::new);
+				return new LootTrackerRecord(record.getEventId(), record.getUsername(),
+					"", drops, record.getTime());
+			})
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	private Collection<LTItemEntry> convertToLTItemEntries(Collection<ItemStack> stacks)
