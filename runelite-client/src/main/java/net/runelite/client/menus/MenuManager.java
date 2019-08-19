@@ -429,9 +429,7 @@ public class MenuManager
 	{
 		if (!client.isMenuOpen() && event.isAuthentic())
 		{
-			// The mouse button will not be 0 if a non draggable widget was clicked,
-			// otherwise the left click entry will have been set in onWidgetPressed
-			if (client.getMouseCurrentButton() != 0)
+			if (event.getMouseButton() != 0)
 			{
 				leftClickEntry = rebuildLeftClickMenu();
 			}
@@ -550,6 +548,18 @@ public class MenuManager
 		return entry;
 	}
 
+	public AbstractComparableEntry addPriorityEntry(String option, boolean strictOption)
+	{
+		option = Text.standardize(option);
+
+		AbstractComparableEntry entry =
+			newBaseComparableEntry(option, "", -1, -1, false, strictOption);
+
+		priorityEntries.add(entry);
+
+		return entry;
+	}
+
 	public AbstractComparableEntry addPriorityEntry(AbstractComparableEntry entry)
 	{
 		priorityEntries.add(entry);
@@ -557,11 +567,26 @@ public class MenuManager
 		return entry;
 	}
 
+	public void removePriorityEntry(AbstractComparableEntry entry)
+	{
+		priorityEntries.removeIf(entry::equals);
+	}
+
 	public void removePriorityEntry(String option)
 	{
 		option = Text.standardize(option);
 
 		AbstractComparableEntry entry = newBaseComparableEntry(option, "", false);
+
+		priorityEntries.removeIf(entry::equals);
+	}
+
+	public void removePriorityEntry(String option, boolean strictOption)
+	{
+		option = Text.standardize(option);
+
+		AbstractComparableEntry entry =
+			newBaseComparableEntry(option, "", -1, -1, false, strictOption);
 
 		priorityEntries.removeIf(entry::equals);
 	}
