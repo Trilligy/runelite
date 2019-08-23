@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Owain van Brakel <https://github.com/Owain94>
+ * Copyright (c) 2019, Alexander V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,43 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.menuentryswapper;
+package net.runelite.client.plugins.chatboxperformance;
 
-import com.google.common.base.Splitter;
-import java.util.Map;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-public class Parse
+@ConfigGroup("chatboxperformance")
+public interface ChatboxPerformanceConfig extends Config
 {
-	public static boolean parse(String value)
+	@ConfigItem(
+			position = 1,
+			keyName = "Chatbox",
+			name = "Toggle gradient",
+			description = "Toggles the gradient inside the chatbox."
+	)
+	default boolean transparentChatBox()
 	{
-		try
-		{
-			final StringBuilder sb = new StringBuilder();
-
-			for (String str : value.split("\n"))
-			{
-				if (!str.startsWith("//"))
-				{
-					sb.append(str).append("\n");
-				}
-			}
-
-			final Splitter NEWLINE_SPLITTER = Splitter
-				.on("\n")
-				.omitEmptyStrings()
-				.trimResults();
-
-			final Map<String, String> tmp = NEWLINE_SPLITTER.withKeyValueSeparator(':').split(sb);
-
-			for (String str : tmp.values())
-			{
-				Integer.parseInt(str.trim());
-			}
-			return true;
-		}
-		catch (Exception ex)
-		{
-			return false;
-		}
+		return true; //default enabled, just like in game.
 	}
 }

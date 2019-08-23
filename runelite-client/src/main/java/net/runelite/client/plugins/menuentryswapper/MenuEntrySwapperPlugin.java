@@ -36,6 +36,7 @@ import com.google.inject.Provides;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,9 +48,9 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
-import net.runelite.api.MenuAction;
-import static net.runelite.api.MenuAction.MENU_ACTION_DEPRIORITIZE_OFFSET;
-import static net.runelite.api.MenuAction.WALK;
+import net.runelite.api.MenuOpcode;
+import static net.runelite.api.MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET;
+import static net.runelite.api.MenuOpcode.WALK;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
@@ -115,9 +116,9 @@ public class MenuEntrySwapperPlugin extends Plugin
 {
 	private static final String CONFIG_GROUP = "shiftclick";
 	private static final int PURO_PURO_REGION_ID = 10307;
-	private static final Set<MenuAction> NPC_MENU_TYPES = ImmutableSet.of(
-		MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION, MenuAction.NPC_THIRD_OPTION,
-		MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION, MenuAction.EXAMINE_NPC
+	private static final Set<MenuOpcode> NPC_MENU_TYPES = ImmutableSet.of(
+		MenuOpcode.NPC_FIRST_OPTION, MenuOpcode.NPC_SECOND_OPTION, MenuOpcode.NPC_THIRD_OPTION,
+		MenuOpcode.NPC_FOURTH_OPTION, MenuOpcode.NPC_FIFTH_OPTION, MenuOpcode.EXAMINE_NPC
 	);
 	private static final Splitter NEWLINE_SPLITTER = Splitter
 		.on("\n")
@@ -156,6 +157,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 	private boolean inCoxRaid = false;
 	private final Map<AbstractComparableEntry, Integer> customSwaps = new HashMap<>();
 	private final Map<AbstractComparableEntry, Integer> customShiftSwaps = new HashMap<>();
+	private final Map<AbstractComparableEntry, AbstractComparableEntry> dePrioSwaps = new HashMap<>();
 	private List<String> bankItemNames = new ArrayList<>();
 	private ConstructionMode getConstructionMode;
 	private BurningAmuletMode getBurningAmuletMode;
@@ -532,7 +534,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 			{
 				MenuEntry[] menuEntries = client.getMenuEntries();
 				MenuEntry menuEntry = menuEntries[menuEntries.length - 1];
-				menuEntry.setType(MenuAction.WALK.getId() + MENU_ACTION_DEPRIORITIZE_OFFSET);
+				menuEntry.setOpcode(MenuOpcode.WALK.getId() + MENU_ACTION_DEPRIORITIZE_OFFSET);
 				client.setMenuEntries(menuEntries);
 			}
 			else if (option.equalsIgnoreCase("examine"))
@@ -547,7 +549,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 
 		if (hintArrowNpc != null
 			&& hintArrowNpc.getIndex() == eventId
-			&& NPC_MENU_TYPES.contains(MenuAction.of(event.getType())))
+			&& NPC_MENU_TYPES.contains(MenuOpcode.of(event.getType())))
 		{
 			return;
 		}
@@ -709,6 +711,16 @@ public class MenuEntrySwapperPlugin extends Plugin
 
 	private void addSwaps()
 	{
+		final Map<String, String> tmp = NEWLINE_SPLITTER.withKeyValueSeparator(',').split(config.prioEntry());
+
+		for (Map.Entry<String, String> str : tmp.entrySet())
+		{
+			final AbstractComparableEntry a = newBaseComparableEntry("", str.getValue(), -1, -1, false, true);
+			final AbstractComparableEntry b = newBaseComparableEntry(str.getKey(), "", -1, -1, false, false);
+			dePrioSwaps.put(a, b);
+			menuManager.addSwap(a, b);
+		}
+
 		if (this.getWithdrawOne)
 		{
 			Text.fromCSV(this.getWithdrawOneItems).forEach(item ->
@@ -1171,6 +1183,12 @@ public class MenuEntrySwapperPlugin extends Plugin
 
 	private void removeSwaps()
 	{
+		final Iterator<Map.Entry<AbstractComparableEntry, AbstractComparableEntry>> dePrioIter = dePrioSwaps.entrySet().iterator();
+		dePrioIter.forEachRemaining((e) ->
+		{
+			menuManager.removeSwap(e.getKey(), e.getValue());
+			dePrioIter.remove();
+		});
 		Text.fromCSV(this.getWithdrawOneItems).forEach(item ->
 		{
 			menuManager.removePriorityEntry(newBankComparableEntry("Withdraw-1", item));
@@ -1664,7 +1682,7 @@ public class MenuEntrySwapperPlugin extends Plugin
 	{
 		final String customSwaps = config.customSwaps();
 
-		if (!Parse.parse(customSwaps) && oldParse(customSwaps))
+		if (!CustomSwapParse.parse(customSwaps) && oldParse(customSwaps))
 		{
 			final StringBuilder sb = new StringBuilder();
 
@@ -1696,7 +1714,20 @@ public class MenuEntrySwapperPlugin extends Plugin
 
 		// Ugly band-aid i'm sorry
 		configManager.setConfiguration("menuentryswapper", "customSwaps",
-			Arrays.stream(config.customSwaps().split("\n")).distinct().filter(swap -> !"walk here".equals(swap.split(":")[0].trim().toLowerCase())).filter(swap -> !"cancel".equals(swap.split(":")[0].trim().toLowerCase())).collect(Collectors.joining("\n"))
+			Arrays.stream(config.customSwaps()
+				.split("\n"))
+				.distinct()
+				.filter(swap -> !"walk here"
+					.equals(swap.
+						split(":")[0]
+						.trim()
+						.toLowerCase()))
+				.filter(swap -> !"cancel"
+					.equals(swap
+						.split(":")[0]
+						.trim()
+						.toLowerCase()))
+				.collect(Collectors.joining("\n"))
 		);
 	}
 }

@@ -342,6 +342,7 @@ public interface Client extends GameShell
 	 *
 	 * @return the logged in player
 	 */
+	@Nullable
 	Player getLocalPlayer();
 
 	/**
@@ -422,6 +423,7 @@ public interface Client extends GameShell
 	 *
 	 * @return the selected tile
 	 */
+	@Nullable
 	Tile getSelectedSceneTile();
 
 	/**
@@ -436,6 +438,7 @@ public interface Client extends GameShell
 	 *
 	 * @return the dragged widget, null if not dragging any widget
 	 */
+	@Nullable
 	Widget getDraggedWidget();
 
 	/**
@@ -446,6 +449,7 @@ public interface Client extends GameShell
 	 *
 	 * @return the dragged on widget, null if not dragging any widget
 	 */
+	@Nullable
 	Widget getDraggedOnWidget();
 
 	/**
@@ -1685,7 +1689,7 @@ public interface Client extends GameShell
 	 *
 	 * @param param0 This is SceneX for gameObject, index for items, and 0 for npc.
 	 * @param param1 This is SceneY for gameObject, static for items, and 0 for npc.
-	 * @param type Menu entry Action type.
+	 * @param type Menu entry Action opcode.
 	 * @param id Targets ID
 	 * @param menuEntry Do these actually matter?
 	 * @param targetString Do these actually matter?
