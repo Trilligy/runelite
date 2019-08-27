@@ -110,7 +110,7 @@ import net.runelite.client.ui.components.colorpicker.RuneliteColorPicker;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.MiscUtils;
-import net.runelite.client.util.Text;
+import net.runelite.api.util.Text;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
@@ -662,11 +662,23 @@ public class ConfigPanel extends PluginPanel
 									@SuppressWarnings("unchecked") Enum selectedItem = Enum.valueOf(type, configManager.getConfiguration(cd.getGroup().value(), cid2.getItem().keyName()));
 									if (!cid.getItem().unhideValue().equals(""))
 									{
-										show = selectedItem.toString().equals(cid.getItem().unhideValue());
+										List<String> unhideValue = Splitter
+											.onPattern("\\|\\|")
+											.trimResults()
+											.omitEmptyStrings()
+											.splitToList(cid.getItem().unhideValue());
+
+										show = unhideValue.contains(selectedItem.toString());
 									}
 									else if (!cid.getItem().hideValue().equals(""))
 									{
-										show = !selectedItem.toString().equals(cid.getItem().hideValue());
+										List<String> hideValue = Splitter
+											.onPattern("\\|\\|")
+											.trimResults()
+											.omitEmptyStrings()
+											.splitToList(cid.getItem().hideValue());
+
+										show = !hideValue.contains(selectedItem.toString());
 									}
 								}
 								catch (IllegalArgumentException ex)
