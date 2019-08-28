@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019, Alexsuperfly <https://github.com/Alexsuperfly>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api.kit;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+package net.runelite.client.plugins.screenshot;
 
-/**
- * Represents an equipment slot in a players composition.
- * <p>
- * These values are intended for use with {PlayerAppearance} equipment
- * slots. For obtaining information about equipment in the local players
- * equipment {net.runelite.api.ItemContainer}, use
- * {net.runelite.api.EquipmentInventorySlot}.
- */
-@Getter
-@AllArgsConstructor
-public enum KitType
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public enum UploadStyle
 {
-	HELMET("Helmet", 0),
-	CAPE("Cape", 1),
-	AMULET("Amulet", 2),
-	WEAPON("Weapon", 3),
-	TORSO("Torso", 4),
-	SHIELD("Shield", 5),
-	LEGS("Legs", 7),
-	HEAD("Head", 8),
-	HANDS("Hands", 9),
-	BOOTS("Boots", 10),
-	JAW("Jaw", 11),
-	RING("Ring", 12),
-	AMMUNITION("Ammo", 13);
+	NEITHER("Neither"),
+	IMGUR("Imgur"),
+	CLIPBOARD("Clipboard");
 
 	private final String name;
 
-	/**
-	 * Gets the raw equipment index for use in {PlayerAppearance#getEquipmentIds()}.
-	 */
-	private final int index;
+	@Override
+	public String toString()
+	{
+		return name;
+	}
 }
