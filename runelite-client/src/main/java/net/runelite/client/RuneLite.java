@@ -264,15 +264,16 @@ public class RuneLite
 
 		Thread.setDefaultUncaughtExceptionHandler((thread, throwable) ->
 		{
-			log.error("Uncaught exception:", throwable);
 			if (throwable instanceof AbstractMethodError)
 			{
-				log.error("Classes are out of date; Build with Gradle again.");
+				RuneLiteSplashScreen.setError("Out of date!", "Classes are out of date; Build with Gradle again.");
+				return;
 			}
+
+			RuneLiteSplashScreen.setError("Error while loading!", "Please check your internet connection and your DNS settings.");
 		});
 
-
-		RuneLiteSplashScreen.stage(.2, "Starting RuneLitePlus injector");
+		RuneLiteSplashScreen.stage(0, "Starting RuneLitePlus injector");
 
 		final long start = System.currentTimeMillis();
 
@@ -322,13 +323,13 @@ public class RuneLite
 		// to main settings
 		pluginManager.loadDefaultPluginConfiguration();
 
-		// Initialize UI
-		RuneLiteSplashScreen.stage(.75, "Initialize UI");
-		clientUI.init(this);
-
 		// Start client session
-		RuneLiteSplashScreen.stage(.80, "Starting core interface");
+		RuneLiteSplashScreen.stage(.75, "Starting core interface");
 		clientSessionManager.start();
+
+		// Initialize UI
+		RuneLiteSplashScreen.stage(.80, "Initialize UI");
+		clientUI.init(this);
 
 		if (!isOutdated)
 		{
